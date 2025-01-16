@@ -5,8 +5,6 @@ import { cacheGet, cacheSet, cacheDelete } from '../redis';
 const prisma = new PrismaClient();
 const router = Router();
 
-
-// Get movie by ID
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const cacheKey = `movie:${id}`;
@@ -54,13 +52,10 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
           imdbRating: true,
           appRating: true,
           releaseDate: true,
-        }, // Return only necessary fields
+        },
       });
 
-    //   console.log(movies);
-  
-      // Cache the results
-      await cacheSet(cacheKey, movies, 600); // Cache for 10 minutes
+      await cacheSet(cacheKey, movies, 600);
   
       res.json({ source: 'database', data: movies });
     } catch (error) {
@@ -68,7 +63,6 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     }
   });
 
-// Add a movie
 router.post('/', async (req: Request, res: Response): Promise<void> => {
     const { title, description, duration, releaseDate, posterUrl, trailerUrl, imdbRating, appRating, status } = req.body;
 
@@ -76,7 +70,6 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       data: { title, description, duration, releaseDate, posterUrl, trailerUrl, imdbRating, appRating, status },
     });
 
-    // Invalidate movie list cache
     await cacheDelete('movies:all');
 
     res.status(201).json(newMovie);
