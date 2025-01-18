@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: movieapp
+      POSTGRES_PASSWORD: secretpass
+      POSTGRES_DB: moviebooking
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:6
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  movie-service:
+    build:
+      context: ./movie-service
+    container_name: movie-service
+    restart: always
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://movieapp:secretpass@postgres:5432/moviebooking
+      REDIS_URL: redis://redis:6379
+    command: ["npx", "ts-node", "src/index.ts"]
+
+  theater-service:
+    build:
+      context: ./theater-service
+    container_name: theater-service
+    restart: always
+    ports:
+      - "3003:3003"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://movieapp:secretpass@postgres:5432/moviebooking
+      REDIS_URL: redis://redis:6379
+    command: ["npx", "ts-node", "src/index.ts"]
+
+  booking-service:
+    build:
+      context: ./booking-service
+    container_name: booking-service
+    restart: always
+    ports:
+      - "3004:3004"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://movieapp:secretpass@postgres:5432/moviebooking
+      REDIS_URL: redis://redis:6379
+      LOCK_TTL: 300000
+      BOOKING_TIMEOUT: 300
+      QUEUE_JOB_TIMEOUT: 5000
+      QUEUE_JOB_ATTEMPTS: 3
+    command: ["npx", "ts-node", "src/server.ts"]
+
+volumes:
+  postgres_data:
+  redis_data:

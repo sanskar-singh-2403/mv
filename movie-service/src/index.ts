@@ -9,7 +9,7 @@ app.use(express.json());
 const pool = new Pool({
   user: 'movieapp',
   password: 'secretpass',
-  host: 'localhost',
+  host: 'postgres',
   database: 'moviebooking',
   port: 5432
 });
