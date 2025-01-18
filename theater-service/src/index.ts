@@ -228,8 +228,8 @@ app.get('/api/shows/:showId/seats', async (req: Request, res: Response) => {
   try {
     const cachedSeats = await redis.get(cacheKey);
     if (cachedSeats) {
-      // res.json({ source: 'cache', data: JSON.parse(cachedSeats) });
-      // return;
+      res.json({ source: 'cache', data: JSON.parse(cachedSeats) });
+      return;
     }
 
     const result = await pool.query(
