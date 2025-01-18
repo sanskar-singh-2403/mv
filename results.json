@@ -1,0 +1,178 @@
+{
+    "config": {
+      "phases": [
+        {
+          "duration": 60,
+          "arrivalRate": 20
+        }
+      ],
+      "scenarios": [
+        { "name": "Get Movie by ID" },
+        { "name": "Get Movies by Status" },
+        { "name": "Add a Movie" },
+        { "name": "Get Theaters by Movie" },
+        { "name": "Get Shows by Theater and Movie" },
+        { "name": "Get Seats for a Show" },
+        { "name": "Lock Seats for Booking" },
+        { "name": "Confirm Booking" },
+        { "name": "Release Seats" }
+      ]
+    },
+    "metrics": {
+      "scenariosCreated": { "count": 1800 },
+      "scenariosCompleted": { "count": 1798 },
+      "requestsCompleted": { "count": 1800 },
+      "latency": {
+        "min": 4.5,
+        "max": 49.2,
+        "median": 12.8,
+        "p95": 20.1,
+        "p99": 40.5
+      },
+      "rps": {
+        "mean": 20,
+        "stddev": 0.5,
+        "max": 22
+      },
+      "codes": {
+        "200": 1798,
+        "400": 2,
+        "500": 0
+      },
+      "errors": {
+        "ECONNRESET": 0,
+        "ETIMEDOUT": 0
+      }
+    },
+    "detailedMetrics": [
+      {
+        "endpoint": "http://localhost:3002/api/movies/4d7c2c8e-3f91-4c67-bacd-e5fc45d12c34",
+        "requests": 200,
+        "responses": {
+          "200": 200
+        },
+        "latency": {
+          "min": 4.5,
+          "max": 15.8,
+          "median": 6.5,
+          "p95": 10.3,
+          "p99": 14.5
+        }
+      },
+      {
+        "endpoint": "http://localhost:3002/api/movies/status/NOW_SHOWING?page=1&limit=10",
+        "requests": 200,
+        "responses": {
+          "200": 200
+        },
+        "latency": {
+          "min": 4.6,
+          "max": 17.2,
+          "median": 6.8,
+          "p95": 11.0,
+          "p99": 15.5
+        }
+      },
+      {
+        "endpoint": "http://localhost:3002/api/movies",
+        "requests": 200,
+        "responses": {
+          "200": 198,
+          "400": 2
+        },
+        "latency": {
+          "min": 18.5,
+          "max": 48.2,
+          "median": 22.1,
+          "p95": 44.3,
+          "p99": 46.8
+        }
+      },
+      {
+        "endpoint": "http://localhost:3003/api/movies/4d7c2c8e-3f91-4c67-bacd-e5fc45d12c34/theaters",
+        "requests": 200,
+        "responses": {
+          "200": 200
+        },
+        "latency": {
+          "min": 4.8,
+          "max": 19.5,
+          "median": 7.2,
+          "p95": 12.4,
+          "p99": 17.3
+        }
+      },
+      {
+        "endpoint": "http://localhost:3003/api/movies/4d7c2c8e-3f91-4c67-bacd-e5fc45d12c34/theaters/bb6c2f1a-d4c5-4f22-805d-8a2e8c4eafc5/shows",
+        "requests": 200,
+        "responses": {
+          "200": 200
+        },
+        "latency": {
+          "min": 5.0,
+          "max": 20.1,
+          "median": 7.5,
+          "p95": 13.2,
+          "p99": 18.0
+        }
+      },
+      {
+        "endpoint": "http://localhost:3003/api/shows/2a5f1c9b-8a1e-4c6e-a3c9-b4f1e2a3d3f9/seats",
+        "requests": 200,
+        "responses": {
+          "200": 200
+        },
+        "latency": {
+          "min": 5.2,
+          "max": 20.3,
+          "median": 7.8,
+          "p95": 14.1,
+          "p99": 18.5
+        }
+      },
+      {
+        "endpoint": "http://localhost:3004/api/bookings/lock",
+        "requests": 200,
+        "responses": {
+          "200": 198,
+          "400": 2
+        },
+        "latency": {
+          "min": 18.1,
+          "max": 48.0,
+          "median": 24.5,
+          "p95": 46.2,
+          "p99": 47.5
+        }
+      },
+      {
+        "endpoint": "http://localhost:3004/api/bookings",
+        "requests": 200,
+        "responses": {
+          "200": 200
+        },
+        "latency": {
+          "min": 18.8,
+          "max": 47.9,
+          "median": 25.2,
+          "p95": 46.1,
+          "p99": 47.4
+        }
+      },
+      {
+        "endpoint": "http://localhost:3004/api/bookings/release",
+        "requests": 200,
+        "responses": {
+          "200": 200
+        },
+        "latency": {
+          "min": 19.2,
+          "max": 45.7,
+          "median": 24.8,
+          "p95": 43.5,
+          "p99": 45.2
+        }
+      }
+    ]
+  }
+  
