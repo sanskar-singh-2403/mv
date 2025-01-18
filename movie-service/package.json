@@ -22,7 +22,9 @@
     "helmet": "^8.0.0",
     "ioredis": "^5.4.2",
     "pg": "^8.13.1",
-    "redis": "^4.7.0"
+    "redis": "^4.7.0",
+    "express-rate-limit": "^6.7.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

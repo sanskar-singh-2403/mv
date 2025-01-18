@@ -45,6 +45,7 @@ app.post('/api/theaters/:theaterId/screens', async (req: Request, res: Response)
   try {
     await client.query('BEGIN');
 
+    // Insert the screen
     const screenResult = await client.query<Screen>(
       'INSERT INTO screens (screen_number, theater_id, layout) VALUES ($1, $2, $3) RETURNING *',
       [screenNumber, theaterId, layout]
@@ -52,25 +53,51 @@ app.post('/api/theaters/:theaterId/screens', async (req: Request, res: Response)
 
     const screen = screenResult.rows[0];
     const { rows, seatsPerRow } = layout;
-    console.log(rows, seatsPerRow);
 
+    // Prepare seat data
+    const seatData: { screenId: string; number: string }[] = [];
     for (let row = 1; row <= rows; row++) {
       for (let seat = 1; seat <= seatsPerRow; seat++) {
-        console.log(screen.id);
-        await client.query(
-          'INSERT INTO seats (screen_id, number) VALUES ($1, $2)',
-          [screen.id, `R${row}S${seat}`]
-        );
+        seatData.push({
+          screenId: screen.id,
+          number: `R${row}S${seat}`,
+        });
       }
     }
 
+    const CHUNK_SIZE = 1000;
+    const chunks = Array.from({ length: Math.ceil(seatData.length / CHUNK_SIZE) }, (_, i) =>
+      seatData.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+    );
+
+    // Parallelize seat insertion
+    const insertPromises = chunks.map(chunk => {
+      const values: string[] = [];
+      const params: any[] = [];
+      let paramIndex = 1;
+
+      chunk.forEach(({ screenId, number }) => {
+        values.push(`($${paramIndex}, $${paramIndex + 1})`);
+        params.push(screenId, number);
+        paramIndex += 2;
+      });
+
+      const query = `
+        INSERT INTO seats (screen_id, number)
+        VALUES ${values.join(', ')}
+      `;
+      return client.query(query, params);
+    });
+
+    await Promise.all(insertPromises);
+
     await client.query('COMMIT');
-    
+
     const response = {
       ...screen,
-      totalSeats: rows * seatsPerRow
+      totalSeats: rows * seatsPerRow,
     };
-    
+
     res.status(201).json(response);
   } catch (error) {
     await client.query('ROLLBACK');
@@ -201,8 +228,8 @@ app.get('/api/shows/:showId/seats', async (req: Request, res: Response) => {
   try {
     const cachedSeats = await redis.get(cacheKey);
     if (cachedSeats) {
-      res.json({ source: 'cache', data: JSON.parse(cachedSeats) });
-      return;
+      // res.json({ source: 'cache', data: JSON.parse(cachedSeats) });
+      // return;
     }
 
     const result = await pool.query(

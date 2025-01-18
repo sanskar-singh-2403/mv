@@ -1,9 +1,7 @@
--- Create ENUM types first
 CREATE TYPE movie_status AS ENUM ('UPCOMING', 'NOW_SHOWING', 'HIGHLIGHTS');
 CREATE TYPE seat_status AS ENUM ('AVAILABLE', 'BOOKED', 'LOCKED');
 CREATE TYPE booking_status AS ENUM ('PENDING', 'CONFIRMED', 'CANCELLED');
 
--- Movies table
 CREATE TABLE movies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL,
@@ -19,7 +17,6 @@ CREATE TABLE movies (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Theaters table
 CREATE TABLE theaters (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
@@ -28,7 +25,6 @@ CREATE TABLE theaters (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Screens table
 CREATE TABLE screens (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     screen_number INTEGER NOT NULL,
@@ -38,7 +34,6 @@ CREATE TABLE screens (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Seats table
 CREATE TABLE seats (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     screen_id UUID NOT NULL REFERENCES screens(id),
@@ -47,7 +42,6 @@ CREATE TABLE seats (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Shows table
 CREATE TABLE shows (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     movie_id UUID NOT NULL,
@@ -62,7 +56,6 @@ CREATE TABLE shows (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Show Seats table
 CREATE TABLE show_seats (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     show_id UUID NOT NULL REFERENCES shows(id),
@@ -72,7 +65,6 @@ CREATE TABLE show_seats (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Bookings table
 CREATE TABLE bookings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     show_id UUID NOT NULL REFERENCES shows(id),
@@ -84,19 +76,17 @@ CREATE TABLE bookings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indexes for movies
 CREATE INDEX idx_movies_status ON movies(status);
 
--- Indexes for shows
+CREATE INDEX idx_seats_screen_id ON seats (screen_id);
+
 CREATE INDEX idx_shows_theater ON shows(theater_id);
 CREATE INDEX idx_shows_screen ON shows(screen_id);
 CREATE INDEX idx_shows_timing ON shows(start_time, end_time);
 
--- Indexes for show seats
 CREATE INDEX idx_show_seats_show ON show_seats(show_id);
 CREATE INDEX idx_show_seats_status ON show_seats(status);
 
--- Indexes for bookings
 CREATE INDEX idx_bookings_user ON bookings(user_id);
 CREATE INDEX idx_bookings_show ON bookings(show_id);
 CREATE INDEX idx_bookings_status ON bookings(status);
