@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Environment validation
 const requiredEnvVars = [
   'DATABASE_URL',
   'REDIS_URL',
@@ -23,7 +22,6 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
-// PostgreSQL configuration
 const poolConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
   max: parseInt(process.env.DB_POOL_SIZE || '20'),
@@ -33,7 +31,6 @@ const poolConfig: PoolConfig = {
 
 export const db = new Pool(poolConfig);
 
-// Test database connection
 db.on('error', (err) => {
   console.error('Unexpected database error:', err);
 });
@@ -42,7 +39,6 @@ db.on('connect', () => {
   console.log('Database connected successfully');
 });
 
-// Redis configuration
 const redisConfig = {
   maxRetriesPerRequest: 3,
   enableReadyCheck: true,
@@ -59,13 +55,10 @@ const redisConfig = {
   },
 };
 
-// Redis client for general operations
 export const redis = new Redis(process.env.REDIS_URL!, redisConfig);
 
-// Redis client for Redlock
 const redlockClient = new Redis(process.env.REDIS_URL!, redisConfig);
 
-// Configure Redlock for distributed locking
 export const lock = new Redlock(
   [redlockClient],
   {
@@ -77,7 +70,6 @@ export const lock = new Redlock(
   }
 );
 
-// Configure Bull queue
 const bullConfig = {
   defaultJobOptions: {
     removeOnComplete: true,
@@ -97,7 +89,6 @@ const bullConfig = {
 
 export const bookingQueue = new Bull('booking-requests', process.env.REDIS_URL!, bullConfig);
 
-// Environment constants
 export const constants = {
   LOCK_TTL: parseInt(process.env.LOCK_TTL!),
   BOOKING_TIMEOUT: parseInt(process.env.BOOKING_TIMEOUT!),
@@ -106,10 +97,8 @@ export const constants = {
   BATCH_SIZE: parseInt(process.env.CLEANUP_BATCH_SIZE || '100'),
 };
 
-// Redis event handlers with error handling
 redis.on('error', (err) => {
   console.error('Redis Error:', err);
-  // Implement your error monitoring/alerting here
 });
 
 redis.on('connect', () => {
@@ -120,16 +109,12 @@ redis.on('ready', () => {
   console.log('Redis Ready');
 });
 
-// Redlock event handlers
 redlockClient.on('error', (err) => {
   console.error('Redlock Error:', err);
-  // Implement your error monitoring/alerting here
 });
 
-// Queue event handlers with proper logging
 bookingQueue.on('error', (err) => {
   console.error('Bull Queue Error:', err);
-  // Implement your error monitoring/alerting here
 });
 
 bookingQueue.on('waiting', (jobId) => {
@@ -146,15 +131,12 @@ bookingQueue.on('completed', (job) => {
 
 bookingQueue.on('failed', (job, err) => {
   console.error(`Job ${job?.id} has failed:`, err);
-  // Implement your error monitoring/alerting here
 });
 
 bookingQueue.on('stalled', (job) => {
   console.warn(`Job ${job?.id} has stalled`);
-  // Implement your monitoring/alerting here
 });
 
-// Cleanup function for graceful shutdown
 export const cleanup = async () => {
   try {
     console.log('Cleaning up resources...');

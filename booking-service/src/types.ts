@@ -1,5 +1,3 @@
-// types.ts
-
 export enum MovieStatus {
   UPCOMING = 'UPCOMING',
   NOW_SHOWING = 'NOW_SHOWING',
@@ -92,7 +90,7 @@ export interface BookingRequest {
   showId: string;
   userId: string;
   seatIds: string[];
-  isChild: boolean[];  // Array indicating whether each seat is for a child
+  isChild: boolean[];
 }
 
 export interface Booking {
@@ -117,7 +115,6 @@ export interface JobResult {
   message: string;
 }
 
-// Response types
 export interface ApiResponse<T> {
   source?: 'cache' | 'db';
   data?: T;

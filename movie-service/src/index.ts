@@ -20,7 +20,6 @@ const redis = createClient({
 redis.connect().catch(console.error);
 
 
-// Get movie by ID
 app.get('/api/movies/:id', async (req: Request, res: Response):Promise<void> => {
   const { id } = req.params;
   const cacheKey = `movie:${id}`;
@@ -79,7 +78,6 @@ app.get('/api/movies/status/:status', async (req: Request<{ status: MovieStatus 
   }
 });
 
-// Add a movie
 app.post('/api/movies', async (req: Request, res: Response) => {
   const {
     title,

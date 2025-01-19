@@ -19,7 +19,6 @@ const redis = createClient({
 });
 redis.connect().catch(console.error);
 
-// Add a theater
 app.post('/api/theaters', async (req: Request, res: Response) => {
   const { name, location } = req.body;
 
@@ -35,7 +34,6 @@ app.post('/api/theaters', async (req: Request, res: Response) => {
   }
 });
 
-// Add a screen to a theater with automatic seat creation
 app.post('/api/theaters/:theaterId/screens', async (req: Request, res: Response) => {
   const { theaterId } = req.params;
   const { screenNumber, layout } = req.body;
@@ -45,7 +43,6 @@ app.post('/api/theaters/:theaterId/screens', async (req: Request, res: Response)
   try {
     await client.query('BEGIN');
 
-    // Insert the screen
     const screenResult = await client.query<Screen>(
       'INSERT INTO screens (screen_number, theater_id, layout) VALUES ($1, $2, $3) RETURNING *',
       [screenNumber, theaterId, layout]
@@ -54,7 +51,6 @@ app.post('/api/theaters/:theaterId/screens', async (req: Request, res: Response)
     const screen = screenResult.rows[0];
     const { rows, seatsPerRow } = layout;
 
-    // Prepare seat data
     const seatData: { screenId: string; number: string }[] = [];
     for (let row = 1; row <= rows; row++) {
       for (let seat = 1; seat <= seatsPerRow; seat++) {
@@ -70,7 +66,6 @@ app.post('/api/theaters/:theaterId/screens', async (req: Request, res: Response)
       seatData.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
     );
 
-    // Parallelize seat insertion
     const insertPromises = chunks.map(chunk => {
       const values: string[] = [];
       const params: any[] = [];
@@ -108,7 +103,6 @@ app.post('/api/theaters/:theaterId/screens', async (req: Request, res: Response)
   }
 });
 
-// Add a show with automatic show_seats creation
 app.post('/api/shows', async (req: Request, res: Response) => {
   const {
     movieId,
@@ -159,7 +153,6 @@ app.post('/api/shows', async (req: Request, res: Response) => {
   }
 });
 
-// Get theaters showing a specific movie
 app.get('/api/movies/:movieId/theaters', async (req: Request, res: Response) => {
   const { movieId } = req.params;
   const cacheKey = `movie:${movieId}:theaters`;
@@ -189,7 +182,6 @@ app.get('/api/movies/:movieId/theaters', async (req: Request, res: Response) => 
   }
 });
 
-// Get all shows for a movie at a specific theater
 app.get('/api/movies/:movieId/theaters/:theaterId/shows', async (req: Request, res: Response) => {
   const { movieId, theaterId } = req.params;
   const cacheKey = `movie:${movieId}:theater:${theaterId}:shows`;
@@ -220,7 +212,6 @@ app.get('/api/movies/:movieId/theaters/:theaterId/shows', async (req: Request, r
   }
 });
 
-// Get layout and seats for a show
 app.get('/api/shows/:showId/seats', async (req: Request, res: Response) => {
   const { showId } = req.params;
   const cacheKey = `show:${showId}:seats`;
