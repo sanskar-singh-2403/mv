@@ -33,8 +33,8 @@ app.get('/api/movies/:id', async (req: Request, res: Response):Promise<void> => 
   try {
     const cachedMovie = await redis.get(cacheKey);
     if (cachedMovie) {
-      res.json({ source: 'cache', data: JSON.parse(cachedMovie) });
-      return;
+      // res.json({ source: 'cache', data: JSON.parse(cachedMovie) });
+      // return;
     }
 
     const result = await pool.query<Movie>(
@@ -66,8 +66,8 @@ app.get('/api/movies/status/:status', async (req: Request<{ status: MovieStatus 
   try {
     const cachedMovies = await redis.get(cacheKey);
     if (cachedMovies) {
-      res.json({ source: 'cache', data: JSON.parse(cachedMovies) });
-      return;
+      // res.json({ source: 'cache', data: JSON.parse(cachedMovies) });
+      // return;
     }
 
     const result = await pool.query<Movie>(

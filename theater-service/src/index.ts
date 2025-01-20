@@ -7,7 +7,7 @@ import cors from 'cors';
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000'],
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type,Authorization'
 }));
@@ -166,8 +166,8 @@ app.get('/api/movies/:movieId/theaters', async (req: Request, res: Response) => 
   try {
     const cachedTheaters = await redis.get(cacheKey);
     if (cachedTheaters) {
-      res.json({ source: 'cache', data: JSON.parse(cachedTheaters) });
-      return;
+      // res.json({ source: 'cache', data: JSON.parse(cachedTheaters) });
+      // return;
     }
 
     const result = await pool.query(
@@ -195,8 +195,8 @@ app.get('/api/movies/:movieId/theaters/:theaterId/shows', async (req: Request, r
   try {
     const cachedShows = await redis.get(cacheKey);
     if (cachedShows) {
-      res.json({ source: 'cache', data: JSON.parse(cachedShows) });
-      return;
+      // res.json({ source: 'cache', data: JSON.parse(cachedShows) });
+      // return;
     }
 
     const result = await pool.query(
@@ -225,8 +225,8 @@ app.get('/api/shows/:showId/seats', async (req: Request, res: Response) => {
   try {
     const cachedSeats = await redis.get(cacheKey);
     if (cachedSeats) {
-      res.json({ source: 'cache', data: JSON.parse(cachedSeats) });
-      return;
+      // res.json({ source: 'cache', data: JSON.parse(cachedSeats) });
+      // return;
     }
 
     const result = await pool.query(
