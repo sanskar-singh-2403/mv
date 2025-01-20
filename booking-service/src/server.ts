@@ -43,8 +43,6 @@ const validateSeatsForShow = async (showId: string, seatIds: string[], client: a
     'SELECT COUNT(*) as count FROM show_seats WHERE show_id = $1 AND seat_id = ANY($2)',
     [showId, seatIds]
   );
-  console.log(rows[0].count);
-  console.log(seatIds.length);
   return parseInt(rows[0].count) === seatIds.length;
 };
 

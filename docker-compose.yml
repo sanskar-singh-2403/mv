@@ -74,6 +74,24 @@ services:
       QUEUE_JOB_ATTEMPTS: 3
     command: ["npx", "ts-node", "src/server.ts"]
 
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    restart: always
+    ports:
+      - "3005:3005"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://movieapp:secretpass@postgres:5432/moviebooking
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: your_access_secret_key_here
+      JWT_REFRESH_SECRET: your_refresh_secret_key_here
+      PORT: 3005
+    command: ["npx", "ts-node", "src/index.ts"]
+
 volumes:
   postgres_data:
   redis_data:
