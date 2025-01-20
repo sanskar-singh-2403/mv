@@ -2,9 +2,15 @@ import express, { Request, Response } from 'express';
 import { Pool } from 'pg';
 import { createClient } from 'redis';
 import { Movie, MovieStatus } from './types';
+import cors from 'cors';
 
 const app = express();
 app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type,Authorization'
+}));
 
 const pool = new Pool({
   user: 'movieapp',
